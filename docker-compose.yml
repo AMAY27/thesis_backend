@@ -1,0 +1,10 @@
+services:
+  thesis-backend:
+    image: thesis-backend
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    environment:
+      NODE_ENV: docker
+    ports:
+      - 8080:8080
