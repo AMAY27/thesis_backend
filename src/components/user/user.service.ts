@@ -12,6 +12,8 @@ import { SignupUserDto } from './dto/signup-user.dto';
 import { User } from './schemas/user.schema';
 import * as bcrypt from 'bcrypt';
 import { UserResponseDto } from './dto/user-response.dto';
+import { sign } from 'crypto';
+import { convertUserToDto } from './converter/user.converter';
 
 @Injectable()
 export class UserService {
@@ -44,6 +46,28 @@ export class UserService {
             }
             throw error;
         }
+    }
+
+    private async comparePasswords(
+        plainText: string,
+        hashedPassword: string,
+      ): Promise<boolean> {
+        return await bcrypt.compare(plainText, hashedPassword);
+    }
+
+    async signIn(signInUserDto: SigninUserDto): Promise<UserResponseDto> {
+        const { email, password } = signInUserDto;
+        const user = await this.userModel.findOne({email}).exec();
+
+        if (!user || !(await this.comparePasswords(password, user.password))) {
+            this.logger.debug(`User provided password doesn't match`);
+            throw new UnauthorizedException({
+                message: 'Invalid credentials',
+                statusCode: HttpStatus.UNAUTHORIZED,
+            });
+        }
+        const existingUser = await this.userModel.findById(user._id);
+        return convertUserToDto(existingUser);
     }
         
 }
