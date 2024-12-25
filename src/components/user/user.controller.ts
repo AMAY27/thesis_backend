@@ -7,7 +7,7 @@ import {
     Post,
     Query,
     UseGuards,
-  } from '@nestjs/common';
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { SignupUserDto } from './dto/signup-user.dto';
 import { SigninUserDto } from './dto/signin-user.dto';
