@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserModule } from './components/user/user.module';
+import { AlertModule } from './components/alert/alert.module'; 
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { UserModule } from './components/user/user.module';
       isGlobal: true,
     }),
     UserModule,
+    AlertModule,
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({

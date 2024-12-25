@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Date, Document, ObjectId } from 'mongoose';
+import { Date, Document, Types } from 'mongoose';
 
 type time_range = {
     start_time: string;
@@ -14,7 +14,7 @@ type date_range = {
 @Schema()
 export class Alert extends Document {
     @Prop({ required: true })
-    user_id: ObjectId;
+    user_id: Types.ObjectId;
 
     @Prop({ required: true })
     title: string;
@@ -25,10 +25,10 @@ export class Alert extends Document {
     @Prop({ required: true })
     alert_type: string;
 
-    @Prop({ required: true })
+    @Prop({ type: Object, required: true })
     time_range: time_range;
 
-    @Prop({ required: true })
+    @Prop({ type: Object, required: true })
     date_range: date_range;
 
     @Prop({ required: true })
