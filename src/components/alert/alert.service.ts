@@ -36,7 +36,23 @@ export class AlertService {
         }
     }
 
+    async checkAlertandSendNotification(): Promise<Alert[]> {
+        const current = new Date();
+        const currTime = current.toLocaleTimeString();
+        const currDate = current.toISOString().split('T')[0];
+        const alerts = await this.alertModel.find().exec();
+        this.logger.log(`Checking for alerts at ${currTime} on ${currDate}`);
+        return alerts;
+        // Logic to check for alerts and send notifications
+
+    }
+
     async getAlerts(): Promise<Alert[]> {
         return await this.alertModel.find().exec();
     }
+
+    //Custom queries for how many times the event class has been detected.
+    
+
+
 }
