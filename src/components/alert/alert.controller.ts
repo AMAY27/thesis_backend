@@ -3,6 +3,7 @@ import {
     Controller,
     Logger,
     Post,
+    Get
 } from '@nestjs/common';
 import { AlertService } from './alert.service';
 import { AlertCreationDto } from './dto/alert-creation.dto';
@@ -23,4 +24,16 @@ export class AlertController {
         this.logger.log(`Creating an alert`);
         return await this.alertService.createAlert(alertCreationDto);
     }
+
+    @Get('test')
+    @ApiOperation({ 
+        summary: 'Test alert',
+        description: 'Test an alert'
+    })
+    async testAlert() {
+        this.logger.log(`Testing an alert`);
+        return await this.alertService.checkAlertandSendNotification();
+    }
 }
+
+
