@@ -4,6 +4,9 @@ import { Date, Document, Types } from 'mongoose';
 @Schema()
 export class Event extends Document {
     @Prop({ required: true })
+    index: number;
+    
+    @Prop({ required: true })
     Datetime: string;
 
     @Prop({ required: true })

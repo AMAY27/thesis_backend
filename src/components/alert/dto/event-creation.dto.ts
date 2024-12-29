@@ -1,6 +1,10 @@
 import { ApiProperty } from "@nestjs/swagger";
 
 export class EventCreationDto {
+
+    @ApiProperty()
+    index: number;
+    
     @ApiProperty()
     Datetime: string;
 
@@ -16,3 +20,4 @@ export class EventCreationDto {
     @ApiProperty()
     new_date: string;
 }
+
