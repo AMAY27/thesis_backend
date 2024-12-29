@@ -9,6 +9,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { AlertCreationDto } from './dto/alert-creation.dto';
+import { EventCreationDto } from './dto/event-creation.dto';
 import { Alert } from './schemas/alert.schema';
 import { Event } from "./schemas/event.schema";
 
@@ -38,12 +39,40 @@ export class AlertService {
         }
     }
 
+    async createEvent(
+        eventDto: EventCreationDto,
+    ): Promise<{ message: string , statusCode: number}> {
+        try {
+            const newEvent = new this.eventModel({
+                ...eventDto,
+            });
+            await newEvent.save();
+            return { 
+                message: 'Event created successfully', 
+                statusCode: HttpStatus.CREATED, 
+            };
+        } catch (error) {
+            this.logger.error(`Error while creating event: ${error.message}`);
+            throw error;
+        }
+    }
+    
+
     async checkAlertandSendNotification(): Promise<Event[]> {
         const current = new Date();
         const currTime = current.toLocaleTimeString();
         const currDate = current.toISOString().split('T')[0];
         const alerts = await this.alertModel.find().exec();
-        const events = await this.eventModel.find().exec();
+        alerts.map((alert) => {
+            const event = this.eventModel.find({
+                Datetime: { $gte: alert.date_range.start_date, $lte: alert.date_range.end_date },
+            }).exec();
+        })
+        const events = await this.eventModel.find({
+            Datetime: "01-05-2022 00:00",
+            Klassenname: "Ruhe",
+            Confidence: 0.5062
+        }).exec();
         this.logger.log(`Checking for alerts at ${currTime} on ${currDate}`);
         return events;
         // Logic to check for alerts and send notifications

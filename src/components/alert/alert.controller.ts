@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { AlertService } from './alert.service';
 import { AlertCreationDto } from './dto/alert-creation.dto';
+import { EventCreationDto } from './dto/event-creation.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('alert')
@@ -23,6 +24,16 @@ export class AlertController {
     async createAlert(@Body() alertCreationDto: AlertCreationDto) {
         this.logger.log(`Creating an alert`);
         return await this.alertService.createAlert(alertCreationDto);
+    }
+
+    @Post('create-event')
+    @ApiOperation({
+        summary: 'Create event',
+        description: 'Create an event',
+    })
+    async createEvent(@Body() eventCreationDto: EventCreationDto) {
+        this.logger.log(`Creating an event`);
+        return await this.alertService.createEvent(eventCreationDto);
     }
 
     @Get('test')
