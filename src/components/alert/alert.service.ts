@@ -58,15 +58,21 @@ export class AlertService {
     }
     
 
+    // Logic to check for alerts and send notifications
     async checkAlertandSendNotification(): Promise<Event[]> {
         const current = new Date();
         const currTime = current.toLocaleTimeString();
         const currDate = current.toISOString().split('T')[0];
         const alerts = await this.alertModel.find().exec();
+
+        //Fetch all events that are within the date range of the alert
         alerts.map((alert) => {
             const event = this.eventModel.find({
                 Datetime: { $gte: alert.date_range.start_date, $lte: alert.date_range.end_date },
+                Klassenname: alert.classname,
+                new_date: "00:00:08"
             }).exec();
+            // Notification service function call
         })
         const events = await this.eventModel.find({
             Datetime: "01-05-2022 00:00",
@@ -75,7 +81,10 @@ export class AlertService {
         }).exec();
         this.logger.log(`Checking for alerts at ${currTime} on ${currDate}`);
         return events;
-        // Logic to check for alerts and send notifications
+
+    }
+    // Function to add the alert in the datatbase when the alert is triggered
+    async addingTriggeredAlerts({alertId, date_time}) {
 
     }
 
