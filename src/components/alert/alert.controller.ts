@@ -45,6 +45,16 @@ export class AlertController {
         this.logger.log(`Testing an alert`);
         return await this.alertService.checkAlertandSendNotification();
     }
+
+    @Get('alerts')
+    @ApiOperation({ 
+        summary: 'Get alerts',
+        description: 'Get all alerts'
+    })
+    async getAlerts() {
+        this.logger.log(`Getting all alerts`);
+        return await this.alertService.getAlerts();
+    }
 }
 
 
