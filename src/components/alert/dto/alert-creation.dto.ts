@@ -14,16 +14,16 @@ export class AlertCreationDto {
     alert_type: string;
 
     @ApiProperty()
-    time_range: {
-        start_time: string;
-        end_time: string;
-    };
+    start_time: string;
 
     @ApiProperty()
-    date_range: {
-        start_date: Date;
-        end_date: Date;
-    };
+    end_time: string;
+
+    @ApiProperty()
+    start_date: string;
+
+    @ApiProperty()
+    end_date: string;
 
     @ApiProperty()
     status: string;

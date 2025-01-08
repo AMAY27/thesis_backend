@@ -1,15 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Date, Document, Types } from 'mongoose';
 
-type time_range = {
-    start_time: string;
-    end_time: string;
-}
-
-type date_range = {
-    start_date: Date;
-    end_date: Date;
-}
 
 @Schema()
 export class Alert extends Document {
@@ -25,11 +16,17 @@ export class Alert extends Document {
     @Prop({ required: true })
     alert_type: string;
 
-    @Prop({ type: Object, required: true })
-    time_range: time_range;
+    @Prop({ required: true })
+    start_date: string; // Store as formatted string
 
-    @Prop({ type: Object, required: true })
-    date_range: date_range;
+    @Prop({ required: true })
+    end_date: string; // Store as formatted string
+
+    @Prop({ required: true })
+    start_time: string; // Store as formatted string
+
+    @Prop({ required: true })
+    end_time: string;
 
     @Prop({ required: true })
     status: string;
