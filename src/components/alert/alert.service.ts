@@ -65,6 +65,17 @@ export class AlertService {
         const currDate = current.toISOString().split('T')[0];
         const alerts = await this.alertModel.find().exec();
 
+        for (const alert of alerts) {
+            const startDate = alert.date_range.start_date;
+            const endDate = alert.date_range.end_date;
+            const events = await this.eventModel.find({
+                Datetime: { $gte: startDate, $lte: endDate },
+                Klassenname: alert.classname,
+                new_date: { $gte: alert.time_range.start_time, $lte: alert.time_range.end_time }
+            }).exec();
+            // Notification service function call
+        }
+
         //Fetch all events that are within the date range of the alert
         alerts.map((alert) => {
             const event = this.eventModel.find({
