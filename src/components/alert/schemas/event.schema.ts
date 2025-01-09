@@ -6,11 +6,11 @@ export class Event extends Document {
     @Prop({ required: true })
     index: number;
     
-    @Prop({ required: true })
-    Datetime: string;
+    @Prop({ type:Date, required: true })
+    Datetime: Date;
 
-    @Prop({ required: true })
-    Datetime_2: string;
+    @Prop({type:Date, required: true })
+    Datetime_2: Date;
 
     @Prop({ required: true })
     Confidence: number;
@@ -19,7 +19,7 @@ export class Event extends Document {
     Klassenname: string;
 
     @Prop({  required: true })
-    new_date: string;
+    time: string;
 
 }
 

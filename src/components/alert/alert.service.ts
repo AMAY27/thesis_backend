@@ -70,20 +70,32 @@ export class AlertService {
     // Logic to check for alerts and send notifications
     async checkAlertandSendNotification(): Promise<Event[]> {
         const current = new Date();
-        const currTime = current.toLocaleTimeString();
-        const currDate = current.toISOString().split('T')[0];
+        // const currTime = current.toLocaleTimeString().split(' ')[0];
+        // const currDate = moment(current).format('DD-MM-YYYY');
+        const currTime = "00:00:02";
+        const currDate = "02-05-2022 00:00";
+        this.logger.log(`Checking for alerts at ${currTime} on ${currDate}`);
+        // const alerts = await this.alertModel.find({
+        //     start_date: { $lte: currDate },
+        //     end_date: { $gte: currDate },
+        //     start_time: { $lte: currTime },
+        //     end_time: { $gte: currTime },
+        // }).exec();
         const alerts = await this.alertModel.find().exec();
+        let events = [];
 
-        // for (const alert of alerts) {
-        //     const startDate = alert.date_range.start_date;
-        //     const endDate = alert.date_range.end_date;
-        //     const events = await this.eventModel.find({
-        //         Datetime: { $gte: startDate, $lte: endDate },
-        //         Klassenname: alert.classname,
-        //         new_date: { $gte: alert.time_range.start_time, $lte: alert.time_range.end_time }
-        //     }).exec();
-        //     // Notification service function call
-        // }
+        for (const alert of alerts) {
+            const startDate = alert.start_date;
+            const endDate = alert.end_date;
+            events = await this.eventModel.find({
+                Datetime: { $gte: startDate, $lte: endDate },
+                Klassenname: alert.classname,
+                new_date: { $gte: alert.start_time, $lte: alert.end_time }
+            }).exec();
+            // Notification service function call
+        }
+        this.logger.log(`No of events found: ${events.length}`);
+        return events;
 
         // //Fetch all events that are within the date range of the alert
         // alerts.map((alert) => {
@@ -94,13 +106,13 @@ export class AlertService {
         //     }).exec();
         //     // Notification service function call
         // })
-        const events = await this.eventModel.find({
-            Datetime: "01-05-2022 00:00",
-            Klassenname: "Ruhe",
-            Confidence: 0.5062
-        }).exec();
-        this.logger.log(`Checking for alerts at ${currTime} on ${currDate}`);
-        return events;
+        // const events = await this.eventModel.find({
+        //     Datetime: "01-05-2022 00:00",
+        //     Klassenname: "Ruhe",
+        //     Confidence: 0.5062
+        // }).exec();
+        // this.logger.log(`Checking for alerts at ${currTime} on ${currDate}`);
+        // return events;
 
     }
     // Function to add the alert in the datatbase when the alert is triggered

@@ -6,10 +6,10 @@ export class EventCreationDto {
     index: number;
     
     @ApiProperty()
-    Datetime: string;
+    Datetime: Date;
 
     @ApiProperty()
-    Datetime_2: string;
+    Datetime_2: Date;
 
     @ApiProperty()
     Confidence: number;
@@ -18,6 +18,6 @@ export class EventCreationDto {
     Klassenname: string;
 
     @ApiProperty()
-    new_date: string;
+    new_date: Date;
 }
 
