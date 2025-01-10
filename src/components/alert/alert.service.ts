@@ -13,6 +13,7 @@ import { EventCreationDto } from './dto/event-creation.dto';
 import { Alert } from './schemas/alert.schema';
 import { Event } from "./schemas/event.schema";
 import * as moment from 'moment';
+import { Date, Document, Types } from 'mongoose';
 
 @Injectable()
 export class AlertService {
@@ -26,16 +27,12 @@ export class AlertService {
         alertDto: AlertCreationDto,
     ): Promise<{ message: string , statusCode: number}> {
         try {
-            const formattedStartDate = moment(alertDto.start_date).format('DD-MM-YYYY HH:mm');
-            const formattedEndDate = moment(alertDto.end_date).format('DD-MM-YYYY HH:mm');
-            const formattedStartTime = moment(alertDto.start_time, 'HH:mm:ss').format('HH:mm:ss');
-            const formattedEndTime = moment(alertDto.end_time, 'HH:mm:ss').format('HH:mm:ss');
+            // const formattedStartDate = moment(alertDto.start_date).format('DD-MM-YYYY HH:mm');
+            // const formattedEndDate = moment(alertDto.end_date).format('DD-MM-YYYY HH:mm');
+            // const formattedStartTime = moment(alertDto.start_time, 'HH:mm:ss').format('HH:mm:ss');
+            // const formattedEndTime = moment(alertDto.end_time, 'HH:mm:ss').format('HH:mm:ss');
             const newAlert = new this.alertModel({
                 ...alertDto,
-                start_date: formattedStartDate,
-                end_date: formattedEndDate,
-                start_time: formattedStartTime,
-                end_time: formattedEndTime,
             });
             await newAlert.save();
             return { 
@@ -72,25 +69,26 @@ export class AlertService {
         const current = new Date();
         // const currTime = current.toLocaleTimeString().split(' ')[0];
         // const currDate = moment(current).format('DD-MM-YYYY');
-        const currTime = "00:00:02";
-        const currDate = "02-05-2022 00:00";
+        const currTime = moment("05:30:00",  'HH:mm:ss').format('HH:mm:ss');
+        const currDate = moment("2022-05-04", 'YYYY-MM-DD').format('YYYY-MM-DD');
         this.logger.log(`Checking for alerts at ${currTime} on ${currDate}`);
-        // const alerts = await this.alertModel.find({
-        //     start_date: { $lte: currDate },
-        //     end_date: { $gte: currDate },
-        //     start_time: { $lte: currTime },
-        //     end_time: { $gte: currTime },
-        // }).exec();
-        const alerts = await this.alertModel.find().exec();
+        const alerts = await this.alertModel.find({
+            start_date: { $lte: new Date(currDate) },
+            end_date: { $gte: new Date(currDate) },
+            start_time: { $lte: currTime },
+            end_time: { $gte: currTime },
+        }).exec();
+        this.logger.log(`No of alerts found: ${alerts.length}`);
+        // const alerts = await this.alertModel.find().exec();
         let events = [];
 
         for (const alert of alerts) {
             const startDate = alert.start_date;
             const endDate = alert.end_date;
             events = await this.eventModel.find({
-                Datetime: { $gte: startDate, $lte: endDate },
+                Datetime: new Date(currDate),
                 Klassenname: alert.classname,
-                new_date: { $gte: alert.start_time, $lte: alert.end_time }
+                time: { $gte: alert.start_time, $lte: alert.end_time }
             }).exec();
             // Notification service function call
         }
