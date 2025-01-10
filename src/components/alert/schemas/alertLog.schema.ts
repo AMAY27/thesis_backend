@@ -10,8 +10,6 @@ export class AlertLog extends Document {
     @Prop({ required: true })
     triggerDate: Date;
 
-    @Prop({ required: true })
-    message: string;
 }
 
 export const AlertLogSchema = SchemaFactory.createForClass(AlertLog);
