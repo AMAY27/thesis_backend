@@ -20,10 +20,10 @@ export class AlertCreationDto {
     end_time: string;
 
     @ApiProperty()
-    start_date: string;
+    start_date: Date;
 
     @ApiProperty()
-    end_date: string;
+    end_date: Date;
 
     @ApiProperty()
     status: string;

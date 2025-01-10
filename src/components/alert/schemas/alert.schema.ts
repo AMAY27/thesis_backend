@@ -16,11 +16,11 @@ export class Alert extends Document {
     @Prop({ required: true })
     alert_type: string;
 
-    @Prop({ required: true })
-    start_date: string; // Store as formatted string
+    @Prop({ type:Date, required: true })
+    start_date: Date; // Store as formatted string
 
-    @Prop({ required: true })
-    end_date: string; // Store as formatted string
+    @Prop({ type:Date, required: true })
+    end_date: Date; // Store as formatted string
 
     @Prop({ required: true })
     start_time: string; // Store as formatted string
