@@ -10,8 +10,10 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { AlertCreationDto } from './dto/alert-creation.dto';
 import { EventCreationDto } from './dto/event-creation.dto';
+import { AlertLogCreationDto } from './dto/alertLog-creation.dto';
 import { Alert } from './schemas/alert.schema';
 import { Event } from "./schemas/event.schema";
+import { AlertLog } from "./schemas/alertLog.schema";
 import * as moment from 'moment';
 import { Date, Document, Types } from 'mongoose';
 
@@ -20,7 +22,8 @@ export class AlertService {
     private readonly logger = new Logger(AlertService.name);
     constructor(
         @InjectModel(Alert.name) private alertModel: Model<Alert>,
-        @InjectModel(Event.name) private eventModel: Model<Event>
+        @InjectModel(Event.name) private eventModel: Model<Event>,
+        @InjectModel(AlertLog.name) private alertLogModel: Model<AlertLog>,
     ) {}
 
     async createAlert(
@@ -62,6 +65,24 @@ export class AlertService {
             throw error;
         }
     }
+
+    async createAlertLog(
+        alertLogDto: AlertLogCreationDto,
+    ): Promise<{ message: string , statusCode: number}> {
+        try {
+            const newAlertLog = new this.alertLogModel({
+                ...alertLogDto,
+            });
+            await newAlertLog.save();
+            return { 
+                message: 'Alert log created successfully', 
+                statusCode: HttpStatus.CREATED, 
+            };
+        } catch (error) {
+            this.logger.error(`Error while creating alert log: ${error.message}`);
+            throw error;
+        }
+    }
     
 
     // Logic to check for alerts and send notifications
@@ -90,32 +111,18 @@ export class AlertService {
                 Klassenname: alert.classname,
                 time: { $gte: alert.start_time, $lte: alert.end_time }
             }).exec();
+            for (const event of events) {
+                this.createAlertLog({  alertId: alert._id as unknown as string, triggerDate: new Date(event.Datetime) });
+            }
             // Notification service function call
         }
         this.logger.log(`No of events found: ${events.length}`);
         return events;
 
-        // //Fetch all events that are within the date range of the alert
-        // alerts.map((alert) => {
-        //     const event = this.eventModel.find({
-        //         Datetime: { $gte: alert.date_range.start_date, $lte: alert.date_range.end_date },
-        //         Klassenname: alert.classname,
-        //         new_date: "00:00:08"
-        //     }).exec();
-        //     // Notification service function call
-        // })
-        // const events = await this.eventModel.find({
-        //     Datetime: "01-05-2022 00:00",
-        //     Klassenname: "Ruhe",
-        //     Confidence: 0.5062
-        // }).exec();
-        // this.logger.log(`Checking for alerts at ${currTime} on ${currDate}`);
-        // return events;
-
     }
     // Function to add the alert in the datatbase when the alert is triggered
     async addingTriggeredAlerts({alertId, date_time}) {
-
+        
     }
 
     async getAlerts(): Promise<Alert[]> {
