@@ -7,5 +7,5 @@ export class AlertLogCreationDto {
     triggerDate: Date;
     alertTitle: string;
     alertClass: string;
-
+    userId: string;
 }

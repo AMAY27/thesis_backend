@@ -3,7 +3,8 @@ import {
     Controller,
     Logger,
     Post,
-    Get
+    Get,
+    Query
 } from '@nestjs/common';
 import { AlertService } from './alert.service';
 import { AlertCreationDto } from './dto/alert-creation.dto';
@@ -54,6 +55,16 @@ export class AlertController {
     async getAlerts() {
         this.logger.log(`Getting all alerts`);
         return await this.alertService.getAlerts();
+    }
+
+    @Get('notifications')
+    @ApiOperation({ 
+        summary: 'Get notifications',
+        description: 'Get all notifications'
+    })
+    async getNotifications(@Query('userId') userId: string) {
+        this.logger.log(`Getting all notifications`);
+        return await this.alertService.fetchNotifications(userId);
     }
 }
 

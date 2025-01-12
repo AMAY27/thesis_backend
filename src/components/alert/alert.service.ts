@@ -115,7 +115,13 @@ export class AlertService {
                 time: { $gte: alert.start_time, $lte: alert.end_time }
             }).exec();
             for (const event of events) {
-                this.createAlertLog({  alertId: alert._id as unknown as string, triggerDate: new Date(event.Datetime) });
+                this.createAlertLog({  
+                    alertId: alert._id as unknown as string, 
+                    userId:alert.user_id as unknown as string, 
+                    triggerDate: new Date(event.Datetime), 
+                    alertTitle: alert.title, 
+                    alertClass: alert.classname 
+                });
             }
             // Notification service function call
         }
@@ -128,9 +134,21 @@ export class AlertService {
         
     }
 
+
+    async fetchNotifications(userId: string){
+        const currTime = moment("05:30:00",  'HH:mm:ss').format('HH:mm:ss');
+        const currDate = moment("2022-05-04", 'YYYY-MM-DD').format('YYYY-MM-DD');
+        const alerts = await this.alertLogModel.find({
+            userId: userId,
+            triggerDate: new Date(currDate),
+        }).exec();
+        return alerts;
+    }
+
     async getAlerts(): Promise<Alert[]> {
         return await this.alertModel.find().exec();
     }
+
 
     //Custom queries for how many times the event class has been detected.
     
