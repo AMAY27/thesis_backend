@@ -8,6 +8,9 @@ export class AlertLog extends Document {
     alertId: string;
 
     @Prop({ required: true })
+    userId: string;
+
+    @Prop({ required: true })
     triggerDate: Date;
 
     @Prop({ required: true })
