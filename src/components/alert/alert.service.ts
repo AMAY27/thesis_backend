@@ -44,7 +44,10 @@ export class AlertService {
             };
         } catch (error) {
             this.logger.error(`Error while creating alert: ${error.message}`);
-            throw error;
+            throw new HttpException(
+                'Error while creating alert', 
+                HttpStatus.INTERNAL_SERVER_ERROR,
+            );
         }
     }
 
@@ -93,7 +96,7 @@ export class AlertService {
         const currTime = moment("05:30:00",  'HH:mm:ss').format('HH:mm:ss');
         const currDate = moment("2022-05-04", 'YYYY-MM-DD').format('YYYY-MM-DD');
         this.logger.log(`Checking for alerts at ${currTime} on ${currDate}`);
-        const alerts = await this.alertModel.find({
+        const alerts:Alert[] = await this.alertModel.find({
             start_date: { $lte: new Date(currDate) },
             end_date: { $gte: new Date(currDate) },
             start_time: { $lte: currTime },
