@@ -1,11 +1,11 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { Document, Types } from 'mongoose';
 
 export class AlertLogCreationDto {
 
-    @ApiProperty()
     alertId: string;
-    
-    @ApiProperty()
     triggerDate: Date;
+    alertTitle: string;
+    alertClass: string;
 
 }
