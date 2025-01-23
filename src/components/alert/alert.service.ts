@@ -28,7 +28,7 @@ export class AlertService {
 
     async createAlert(
         alertDto: AlertCreationDto,
-    ): Promise<{ message: string , statusCode: number}> {
+    ): Promise<{ message: string , statusCode: number, data: Alert[]}> {
         try {
             // const formattedStartDate = moment(alertDto.start_date).format('DD-MM-YYYY HH:mm');
             // const formattedEndDate = moment(alertDto.end_date).format('DD-MM-YYYY HH:mm');
@@ -38,7 +38,9 @@ export class AlertService {
                 ...alertDto,
             });
             await newAlert.save();
+            const alerts = await this.alertModel.find().exec();
             return { 
+                data: alerts,
                 message: 'Alert created successfully', 
                 statusCode: HttpStatus.CREATED, 
             };
@@ -144,6 +146,7 @@ export class AlertService {
         }).exec();
         return alerts;
     }
+    
 
     async getAlerts(): Promise<Alert[]> {
         return await this.alertModel.find().exec();
