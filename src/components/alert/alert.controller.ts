@@ -57,6 +57,17 @@ export class AlertController {
         return await this.alertService.getAlerts();
     }
 
+    @Get('alert-logs')
+    @ApiOperation({
+        summary: 'Get alert logs',
+        description: 'Get all alert with matching alert_id'
+    })
+    async getAlertLogs(@Query('alertId') alertId: string) {
+        this.logger.log(`Getting alert logs`);
+        return await this.alertService.getAlertLogs(alertId);
+    }
+
+
     @Get('notifications')
     @ApiOperation({ 
         summary: 'Get notifications',
