@@ -13,9 +13,6 @@ export class CustomEvent extends Document {
     @Prop({ required: true })
     classname: string;
 
-    @Prop({ required: true })
-    event_type: string;
-
     @Prop({ type:Date, required: true })
     start_date: Date; // Store as formatted string
 
