@@ -8,6 +8,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { CustomEventCreationDto } from './dto/customEvent-creation.dto';
 import { Model } from 'mongoose';
+import { CustomEvent } from './schemas/customEvents.schema';
 
 @Injectable()
 export class CustomEventsService {

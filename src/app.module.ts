@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserModule } from './components/user/user.module';
 import { AlertModule } from './components/alert/alert.module'; 
+import { CustomEventsModule } from './components/custom-events/custom-events.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { AlertModule } from './components/alert/alert.module';
     }),
     UserModule,
     AlertModule,
+    CustomEventsModule,
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
