@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { CustomEventCreationDto } from './dto/customEvent-creation.dto';
+import { CustomEventAnalyticsResponseDto as CustomEventResp } from './dto/customEventAnalytics-response.dto';
 import { Model } from 'mongoose';
 import { CustomEvent } from './schemas/customEvents.schema';
 import * as moment from 'moment';
@@ -44,16 +45,8 @@ export class CustomEventsService {
         }
     }
 
-    async checkEventOccurence(userId:string, customEventId:string): Promise<Event[]>{
-        // const customEvents = await this.customEventModel.find({user_id: userId}).exec();
-        // for (const customEvent of customEvents){
-        //     const events = await this.eventModel.find({
-        //         Datetime: currDate,
-        //         Klassenname: customEvent.classname,
-        //         time: { $gte: customEvent.start_time, $lte: customEvent.end_time },
-        //     })
-        // }
-        let results = []
+    async checkEventOccurence(userId:string, customEventId:string): Promise<CustomEventResp> {
+        let results: CustomEventResp = { customEventTitle: '', frequencies: [] };
         const customEvent = await this.customEventModel.findOne({user_id: userId, _id: customEventId}).exec();
         if (!customEvent){
             this.logger.error(`CustomEvent with id ${customEventId} not found`);
@@ -71,7 +64,7 @@ export class CustomEventsService {
             const monthMap = new Map<string, { freq: number; dailyFrequency: Map<string, number> }>();
             events.forEach((event) => {
                 const dt = new Date(event.Datetime.toString());
-const           eventMoment = moment(dt.toISOString());
+                const eventMoment = moment(dt.toISOString());
                 const month = eventMoment.format("YYYY-MM"); // e.g. "2025-01"
                 const day = eventMoment.format("YYYY-MM-DD");
                 
@@ -94,15 +87,14 @@ const           eventMoment = moment(dt.toISOString());
                   dailyFrequency,
                 };
             });
-          
-              // Push the result for the custom event
-            results.push({
+
+            results = {
               customEventTitle: customEvent.title,
               frequencies,
-            });
+            };
             // results.push(events);
         }
-        return results;
+        return results ;
     }
     
 }
