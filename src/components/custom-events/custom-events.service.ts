@@ -10,6 +10,7 @@ import { CustomEventCreationDto } from './dto/customEvent-creation.dto';
 import { CustomEventAnalyticsResponseDto as CustomEventResp } from './dto/customEventAnalytics-response.dto';
 import { Model } from 'mongoose';
 import { CustomEvent } from './schemas/customEvents.schema';
+import { CustomEventResponseDto } from './dto/customEvent-response.dto';
 import * as moment from 'moment';
 import { Event } from '../alert/schemas/event.schema';
 
@@ -40,6 +41,30 @@ export class CustomEventsService {
             this.logger.error(`Error while creating customEvent: ${error.message}`);
             throw new HttpException(
                 'Error while creating customEvent', 
+                HttpStatus.INTERNAL_SERVER_ERROR,
+            );
+        }
+    }
+
+    async getCustomEvents(userId:string): Promise<CustomEventResponseDto[]> {
+        try {
+            const customEvents = await this.customEventModel.find({user_id: userId}).exec();
+            return customEvents.map((customEvent) => {
+                return {
+                    id: customEvent._id.toString(),
+                    title: customEvent.title,
+                    classname: customEvent.classname,
+                    start_date: customEvent.start_date.toString().split('T')[0],
+                    end_date: customEvent.end_date.toString().split('T')[0],
+                    start_time: customEvent.start_time,
+                    end_time: customEvent.end_time,
+                    status: customEvent.status,
+                };
+            });
+        } catch (error) {
+            this.logger.error(`Error while fetching customEvents: ${error.message}`);
+            throw new HttpException(
+                'Error while fetching customEvents', 
                 HttpStatus.INTERNAL_SERVER_ERROR,
             );
         }
