@@ -26,6 +26,16 @@ export class CustomEventsController {
         return await this.customEventsService.createCustomEvent(customEventCreationDto);
     }
 
+    @Get('getCustomEvents')
+    @ApiOperation({ 
+        summary: 'Get custom events',
+        description: 'Get custom events',
+    })
+    async getCustomEvents(@Query('userId') userId: string) {
+        this.logger.log(`Getting custom events`);
+        return await this.customEventsService.getCustomEvents(userId);
+    }
+
     @Get('getEventAnalytics')
     @ApiOperation({ 
         summary: 'Get event analytics',
