@@ -45,9 +45,6 @@ export class CustomEventsService {
     }
 
     async checkEventOccurence(userId:string, customEventId:string): Promise<Event[]>{
-        const currTime = moment("05:30:00",  'HH:mm:ss').format('HH:mm:ss');
-        const currDate = moment("2022-05-04", 'YYYY-MM-DD').format('YYYY-MM-DD');
-        this.logger.log(`Checking for alerts at ${currTime} on ${currDate}`);
         // const customEvents = await this.customEventModel.find({user_id: userId}).exec();
         // for (const customEvent of customEvents){
         //     const events = await this.eventModel.find({
@@ -70,8 +67,40 @@ export class CustomEventsService {
                 Klassenname: customEvent.classname,
                 Datetime: { $gte: customEvent.start_date, $lte: customEvent.end_date },
                 time: { $gte: customEvent.start_time, $lte: customEvent.end_time },
-            })
-            results.push(events);
+            }).exec();
+            const monthMap = new Map<string, { freq: number; dailyFrequency: Map<string, number> }>();
+            events.forEach((event) => {
+                const dt = new Date(event.Datetime.toString());
+const           eventMoment = moment(dt.toISOString());
+                const month = eventMoment.format("YYYY-MM"); // e.g. "2025-01"
+                const day = eventMoment.format("YYYY-MM-DD");
+                
+                if (!monthMap.has(month)) {
+                    monthMap.set(month, { freq: 0, dailyFrequency: new Map<string, number>() });
+                }
+                const monthData = monthMap.get(month);
+                monthData.freq += 1;
+
+                const currentCount = monthData.dailyFrequency.get(day) || 0;
+                monthData.dailyFrequency.set(day, currentCount + 1);
+            });
+            const frequencies = Array.from(monthMap.entries()).map(([month, data]) => {
+                const dailyFrequency = Array.from(data.dailyFrequency.entries()).map(([date, count]) => {
+                  return { date, count };
+                });
+                return {
+                  month,
+                  freq: data.freq,
+                  dailyFrequency,
+                };
+            });
+          
+              // Push the result for the custom event
+            results.push({
+              customEventTitle: customEvent.title,
+              frequencies,
+            });
+            // results.push(events);
         }
         return results;
     }
