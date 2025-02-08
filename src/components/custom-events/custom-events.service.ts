@@ -71,8 +71,18 @@ export class CustomEventsService {
     }
 
     async checkEventOccurence(userId:string, customEventId:string): Promise<CustomEventResp> {
-        let results: CustomEventResp = { customEventTitle: '', frequencies: [] };
         const customEvent = await this.customEventModel.findOne({user_id: userId, _id: customEventId}).exec();
+        const customEventDetails: CustomEventResponseDto = {
+            id: customEvent._id.toString(),
+            title: customEvent.title,
+            classname: customEvent.classname,
+            start_date: customEvent.start_date.toString().split('T')[0],
+            end_date: customEvent.end_date.toString().split('T')[0],
+            start_time: customEvent.start_time,
+            end_time: customEvent.end_time,
+            status: customEvent.status,
+        };
+        let results: CustomEventResp = { customEventDetails, frequencies: [] };
         if (!customEvent){
             this.logger.error(`CustomEvent with id ${customEventId} not found`);
             throw new HttpException(
@@ -114,7 +124,7 @@ export class CustomEventsService {
             });
 
             results = {
-              customEventTitle: customEvent.title,
+              customEventDetails: customEventDetails,
               frequencies,
             };
             // results.push(events);
