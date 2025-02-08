@@ -1,7 +1,8 @@
+import { CustomEventResponseDto } from "./customEvent-response.dto";
 
 
 export class CustomEventAnalyticsResponseDto {
-    customEventTitle: string;
+    customEventDetails: CustomEventResponseDto;
     frequencies: FrequenciesDto[];
 }
 
