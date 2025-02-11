@@ -14,6 +14,7 @@ import { AlertLogCreationDto } from './dto/alertLog-creation.dto';
 import { Alert } from './schemas/alert.schema';
 import { Event } from "./schemas/event.schema";
 import { AlertLog } from "./schemas/alertLog.schema";
+import { AlertLogResponseDto } from "./dto/alertLog-response.dto";
 import * as moment from 'moment';
 import { Date, Document, Types } from 'mongoose';
 
@@ -153,10 +154,22 @@ export class AlertService {
         return await this.alertModel.find().exec();
     }
 
-    async getAlertLogs(alert_id:string): Promise<AlertLog[]> {
-        const alert = await this.alertModel.find({_id: alert_id}).exec()
-        const alertLogs = await this.alertLogModel.find({ alertId: alert_id }).exec()
-        return await this.alertLogModel.find({ alertId: alert_id }).exec();
+    async getAlertLogs(alert_id:string): Promise<AlertLogResponseDto> {
+        const alert = await this.alertModel.findOne({_id: alert_id}).exec();
+        const alertLogs = await this.alertLogModel.find({ alertId: alert_id }).exec();
+        const resp:AlertLogResponseDto = {
+            title: alert.title,
+            classname: alert.classname,
+            alert_type: alert.alert_type,
+            start_date: alert.start_date,
+            end_date: alert.end_date,
+            start_time: alert.start_time,
+            end_time: alert.end_time,
+            status: alert.status,
+            createdAt: alert.createdAt,
+            alertLogs: alertLogs
+        };
+        return resp;
     }
 
 
