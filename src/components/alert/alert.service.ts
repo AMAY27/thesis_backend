@@ -154,6 +154,8 @@ export class AlertService {
     }
 
     async getAlertLogs(alert_id:string): Promise<AlertLog[]> {
+        const alert = await this.alertModel.find({_id: alert_id}).exec()
+        const alertLogs = await this.alertLogModel.find({ alertId: alert_id }).exec()
         return await this.alertLogModel.find({ alertId: alert_id }).exec();
     }
 
