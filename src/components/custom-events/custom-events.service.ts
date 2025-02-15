@@ -131,5 +131,11 @@ export class CustomEventsService {
         }
         return results ;
     }
-    
+
+    async getDataForEventsMonitor(){
+        const hours = [1,3,6,12,24];
+        const currDate = new Date();
+        this.logger.log(currDate);
+    }
+
 }
