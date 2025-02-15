@@ -45,4 +45,13 @@ export class CustomEventsController {
         this.logger.log(`Getting event analytics`);
         return await this.customEventsService.checkEventOccurence(userId, customEventId);
     }
+
+    @Get('getEventsMonitorData')
+    @ApiOperation({
+        summary: 'Get data for events monitor',
+        description: 'Get data for events monitor',
+    })
+    async getDataForEventsMonitor(){
+        return await this.customEventsService.getDataForEventsMonitor();
+    }
 }
