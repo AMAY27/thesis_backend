@@ -172,9 +172,6 @@ export class AlertService {
         return resp;
     }
 
-
     //Custom queries for how many times the event class has been detected.
     
-
-
 }
