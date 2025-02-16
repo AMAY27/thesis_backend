@@ -13,6 +13,7 @@ import { CustomEvent } from './schemas/customEvents.schema';
 import { CustomEventResponseDto } from './dto/customEvent-response.dto';
 import * as moment from 'moment';
 import { Event } from '../alert/schemas/event.schema';
+import { getAggregationPipeline } from './aggregationPipeline/eventMonitorAggregation';
 
 @Injectable()
 export class CustomEventsService {
@@ -133,9 +134,33 @@ export class CustomEventsService {
     }
 
     async getDataForEventsMonitor(){
-        const hours = [1,3,6,12,24];
-        const currDate = new Date();
-        this.logger.log(hours);
+        const timenow = moment();
+        const nowTime = timenow.format("HH:mm:ss");
+        const oneHourAgo = timenow.clone().subtract(1, "hours").format("HH:mm:ss");
+        const threeHourAgo = timenow.clone().subtract(3, "hours").format("HH:mm:ss");
+        const sixHourAgo = timenow.clone().subtract(6, "hours").format("HH:mm:ss");
+        const twelveHourAgo = timenow.clone().subtract(12, "hours").format("HH:mm:ss");
+        const twentyFourHourAgo = timenow.clone().subtract(24, "hours").format("HH:mm:ss");
+        const now = new Date("2022-05-02T00:00:00.000Z");
+        const twentyFourHoursAgo = moment(now).subtract(24, 'hours').toDate();
+        const pipeline = [
+            {
+                $match: {
+                    Datetime: { $gte: twentyFourHoursAgo, $lte: now }
+                    // Datetime: now
+                }
+            },
+            ...getAggregationPipeline()
+        ]
+        const result = await this.eventModel.aggregate(pipeline).exec();
+        this.logger.log(
+            "one hour ago: ", oneHourAgo, 
+            "three hours ago: ",threeHourAgo,
+            "6 hours ago: ", sixHourAgo,
+            "12 hrs ago: ", twelveHourAgo,
+            "24 hours ago: ", twentyFourHourAgo,
+            "Start Date: ", moment(now).subtract(24, 'hours').toDate());
+        return result
     }
 
 }
