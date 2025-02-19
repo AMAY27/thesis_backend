@@ -25,6 +25,14 @@ export function getAggregationPipeline(){
     const sixHourAgo = now.clone().subtract(6, "hours").format("HH:mm:ss");
     const twelveHourAgo = now.clone().subtract(12, "hours").format("HH:mm:ss");
     const twentyFourHourAgo = now.clone().subtract(24, "hours").format("HH:mm:ss");
+    const combineCondition = (start: string, end: string) => {
+        return {
+            $and: [
+                buildTimeCondition(start, nowTime),
+                { Klassenname: { $ne: "Ruhe" } }
+            ]
+        };
+    };
     //const nowTime = refMoment.format("HH:mm:ss");
     //const oneHourAgo = refMoment.clone().subtract(1, "hours").format("HH:mm:ss");
     //const threeHourAgo = refMoment.clone().subtract(3, "hours").format("HH:mm:ss");
@@ -35,23 +43,23 @@ export function getAggregationPipeline(){
         {
             $facet: {
                 oneHour: [
-                    { $match: buildTimeCondition(oneHourAgo, nowTime) },
+                    { $match: combineCondition(oneHourAgo, nowTime) },
                     { $group: { _id: "$Klassenname", count: { $sum: 1 } } }
                 ],
                 threeHour: [
-                    { $match: buildTimeCondition(threeHourAgo, nowTime) },
+                    { $match: combineCondition(threeHourAgo, nowTime) },
                     { $group: { _id: "$Klassenname", count: { $sum: 1 } } }
                 ],
                 sixHour: [
-                    { $match: buildTimeCondition(sixHourAgo, nowTime) },
+                    { $match: combineCondition(sixHourAgo, nowTime) },
                     { $group: { _id: "$Klassenname", count: { $sum: 1 } } }
                 ],
                 twelveHour: [
-                    { $match: buildTimeCondition(twelveHourAgo, nowTime) },
+                    { $match: combineCondition(twelveHourAgo, nowTime) },
                     { $group: { _id: "$Klassenname", count: { $sum: 1 } } }
                 ],
                 twentyFourHour: [
-                    { $match: buildTimeCondition(twentyFourHourAgo, nowTime) },
+                    { $match: combineCondition(twentyFourHourAgo, nowTime) },
                     { $group: { _id: "$Klassenname", count: { $sum: 1 } } }
                 ]
             }
