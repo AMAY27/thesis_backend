@@ -41,9 +41,9 @@ export class CustomEventsController {
         summary: 'Get event analytics',
         description: 'Get event analytics',
     })
-    async getEventAnalytics(@Query('userId') userId: string, @Query('customEventId') customEventId: string) {
+    async getEventAnalytics(@Query('userId') userId: string) {
         this.logger.log(`Getting event analytics`);
-        return await this.customEventsService.checkEventOccurence(userId, customEventId);
+        return await this.customEventsService.checkEventOccurence(userId);
     }
 
     @Get('getEventsMonitorData')
