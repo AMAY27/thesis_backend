@@ -1,5 +1,4 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { Document, Types } from 'mongoose';
+
 
 export class AlertLogCreationDto {
 
@@ -8,4 +7,5 @@ export class AlertLogCreationDto {
     alertTitle: string;
     alertClass: string;
     userId: string;
+    time: string;
 }
