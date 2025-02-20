@@ -16,7 +16,7 @@ import { Event } from "./schemas/event.schema";
 import { AlertLog } from "./schemas/alertLog.schema";
 import { AlertLogResponseDto } from "./dto/alertLog-response.dto";
 import * as moment from 'moment';
-import { Date, Document, Types } from 'mongoose';
+// import { Date, Document, Types } from 'mongoose';
 
 @Injectable()
 export class AlertService {
@@ -99,22 +99,20 @@ export class AlertService {
         // const currDate = moment(current).format('DD-MM-YYYY');
         const currTime = moment("05:30:00",  'HH:mm:ss').format('HH:mm:ss');
         const currDate = moment("2022-05-04", 'YYYY-MM-DD').format('YYYY-MM-DD');
-        this.logger.log(`Checking for alerts at ${currTime} on ${currDate}`);
+        this.logger.log(`Checking for alerts at ${currDate}`);
         const alerts:Alert[] = await this.alertModel.find({
-            start_date: { $lte: new Date(currDate) },
-            end_date: { $gte: new Date(currDate) },
+            start_date: { $lte: currDate },
+            end_date: { $gte: currDate },
             start_time: { $lte: currTime },
             end_time: { $gte: currTime },
         }).exec();
-        this.logger.log(`No of alerts found: ${alerts.length}`);
-        // const alerts = await this.alertModel.find().exec();
+        this.logger.log(`No of alerts found: ${alerts.length} and alert: ${alerts}`);
+        
         let events = [];
-
         for (const alert of alerts) {
-            const startDate = alert.start_date;
-            const endDate = alert.end_date;
+            this.logger.log(`Checking for events for alert: ${alert.classname} at ${alert.start_time}`);
             events = await this.eventModel.find({
-                Datetime: new Date(currDate),
+                Datetime: currDate,
                 Klassenname: alert.classname,
                 time: { $gte: alert.start_time, $lte: alert.end_time }
             }).exec();
@@ -124,7 +122,8 @@ export class AlertService {
                     userId:alert.user_id as unknown as string, 
                     triggerDate: new Date(event.Datetime), 
                     alertTitle: alert.title, 
-                    alertClass: alert.classname 
+                    alertClass: alert.classname,
+                    time: event.time,
                 });
             }
             // Notification service function call
@@ -140,11 +139,11 @@ export class AlertService {
 
 
     async fetchNotifications(userId: string){
-        const currTime = moment("05:30:00",  'HH:mm:ss').format('HH:mm:ss');
-        const currDate = moment("2022-05-04", 'YYYY-MM-DD').format('YYYY-MM-DD');
+        const currDate = new Date();
+        this.logger.log(`Checking for alerts at ${currDate}`);
         const alerts = await this.alertLogModel.find({
             userId: userId,
-            triggerDate: new Date(currDate),
+            triggerDate: moment(currDate, 'YYYY-MM-DD').format('YYYY-MM-DD'),
         }).exec();
         return alerts;
     }

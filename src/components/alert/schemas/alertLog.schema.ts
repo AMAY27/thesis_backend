@@ -19,6 +19,9 @@ export class AlertLog extends Document {
     @Prop({ required: true })
     alertClass: string;
 
+    @Prop({ required: true })
+    time: string;
+
 }
 
 export const AlertLogSchema = SchemaFactory.createForClass(AlertLog);
