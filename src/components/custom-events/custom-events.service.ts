@@ -71,34 +71,27 @@ export class CustomEventsService {
         }
     }
 
-    async checkEventOccurence(userId:string, customEventId:string): Promise<CustomEventResp> {
-        const customEvent = await this.customEventModel.findOne({user_id: userId, _id: customEventId}).exec();
-        const customEventDetails: CustomEventResponseDto = {
-            id: customEvent._id.toString(),
-            title: customEvent.title,
-            classname: customEvent.classname,
-            start_date: customEvent.start_date,
-            end_date: customEvent.end_date,
-            start_time: customEvent.start_time,
-            end_time: customEvent.end_time,
-            status: customEvent.status,
-        };
-        let results: CustomEventResp = { customEventDetails, frequencies: [] };
-        if (!customEvent){
-            this.logger.error(`CustomEvent with id ${customEventId} not found`);
-            throw new HttpException(
-                `CustomEvent with id ${customEventId} not found`,
-                HttpStatus.NOT_FOUND,
-            );
-        }
-        else{
-            const events = await this.eventModel.find({
+    async checkEventOccurence(userId:string): Promise<CustomEventResp[]> {
+        const customEvents = await this.customEventModel.find({user_id: userId}).exec();
+        let customEventResult:CustomEventResp[] = [] 
+        await Promise.all(customEvents.map(async (customEvent) => {
+            const customEventDetails: CustomEventResponseDto = {
+                id: customEvent._id.toString(),
+                title: customEvent.title,
+                classname: customEvent.classname,
+                start_date: customEvent.start_date,
+                end_date: customEvent.end_date,
+                start_time: customEvent.start_time,
+                end_time: customEvent.end_time,
+                status: customEvent.status,
+            };
+            const events = this.eventModel.find({
                 Klassenname: customEvent.classname,
                 Datetime: { $gte: customEvent.start_date, $lte: customEvent.end_date },
                 time: { $gte: customEvent.start_time, $lte: customEvent.end_time },
             }).exec();
             const monthMap = new Map<string, { freq: number; dailyFrequency: Map<string, number> }>();
-            events.forEach((event) => {
+            for (const event of await events) {
                 const dt = new Date(event.Datetime.toString());
                 const eventMoment = moment(dt.toISOString());
                 const month = eventMoment.format("YYYY-MM"); // e.g. "2025-01"
@@ -112,7 +105,7 @@ export class CustomEventsService {
 
                 const currentCount = monthData.dailyFrequency.get(day) || 0;
                 monthData.dailyFrequency.set(day, currentCount + 1);
-            });
+            };
             const frequencies = Array.from(monthMap.entries()).map(([month, data]) => {
                 const dailyFrequency = Array.from(data.dailyFrequency.entries()).map(([date, count]) => {
                   return { date, count };
@@ -123,14 +116,67 @@ export class CustomEventsService {
                   dailyFrequency,
                 };
             });
+            let results: CustomEventResp = { customEventDetails, frequencies };
+            customEventResult.push(results)
+        }))
+        // const customEventDetails: CustomEventResponseDto = {
+        //     id: customEvent._id.toString(),
+        //     title: customEvent.title,
+        //     classname: customEvent.classname,
+        //     start_date: customEvent.start_date,
+        //     end_date: customEvent.end_date,
+        //     start_time: customEvent.start_time,
+        //     end_time: customEvent.end_time,
+        //     status: customEvent.status,
+        // };
+        // let results: CustomEventResp = { customEventDetails, frequencies: [] };
+        // if (!customEvent){
+        //     this.logger.error(`CustomEvent with id ${customEventId} not found`);
+        //     throw new HttpException(
+        //         `CustomEvent with id ${customEventId} not found`,
+        //         HttpStatus.NOT_FOUND,
+        //     );
+        // }
+        // else{
+        //     const events = await this.eventModel.find({
+        //         Klassenname: customEvent.classname,
+        //         Datetime: { $gte: customEvent.start_date, $lte: customEvent.end_date },
+        //         time: { $gte: customEvent.start_time, $lte: customEvent.end_time },
+        //     }).exec();
+        //     const monthMap = new Map<string, { freq: number; dailyFrequency: Map<string, number> }>();
+        //     events.forEach((event) => {
+        //         const dt = new Date(event.Datetime.toString());
+        //         const eventMoment = moment(dt.toISOString());
+        //         const month = eventMoment.format("YYYY-MM"); // e.g. "2025-01"
+        //         const day = eventMoment.format("YYYY-MM-DD");
+                
+        //         if (!monthMap.has(month)) {
+        //             monthMap.set(month, { freq: 0, dailyFrequency: new Map<string, number>() });
+        //         }
+        //         const monthData = monthMap.get(month);
+        //         monthData.freq += 1;
 
-            results = {
-              customEventDetails: customEventDetails,
-              frequencies,
-            };
-            // results.push(events);
-        }
-        return results ;
+        //         const currentCount = monthData.dailyFrequency.get(day) || 0;
+        //         monthData.dailyFrequency.set(day, currentCount + 1);
+        //     });
+        //     const frequencies = Array.from(monthMap.entries()).map(([month, data]) => {
+        //         const dailyFrequency = Array.from(data.dailyFrequency.entries()).map(([date, count]) => {
+        //           return { date, count };
+        //         });
+        //         return {
+        //           month,
+        //           freq: data.freq,
+        //           dailyFrequency,
+        //         };
+        //     });
+
+        //     results = {
+        //       customEventDetails: customEventDetails,
+        //       frequencies,
+        //     };
+        //     // results.push(events);
+        // }
+        return customEventResult ;
     }
 
     async getDataForEventsMonitor(){
